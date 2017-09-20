@@ -13,20 +13,20 @@ namespace Badger.Data.Sessions
         {
         }
 
-        public int Execute(ICommand command)
+        public T Execute<T>(ICommand<T> command)
         {
             var builder = new CommandBuilder(CreateCommand());
             return command.Prepare(builder).Execute();
         }
 
-        public async Task<int> ExecuteAsync(ICommand command, CancellationToken cancellationToken)
+        public async Task<T> ExecuteAsync<T>(ICommand<T> command, CancellationToken cancellationToken)
         {
             var builder = new CommandBuilder(await CreateCommandAsync(cancellationToken));
             return await command.Prepare(builder).ExecuteAsync(cancellationToken).ConfigureAwait(false);
   
         }
 
-        public Task<int> ExecuteAsync(ICommand command)
+        public Task<T> ExecuteAsync<T>(ICommand<T> command)
         {
             return ExecuteAsync(command, CancellationToken.None);
         }

@@ -5,6 +5,49 @@ using Xunit;
 
 namespace Badger.Data.Tests.Postgres
 {
+    public class PostgresCommandOutputTest : IClassFixture<PostgresTestFixture>
+    {
+        SessionFactory sessionFactory;
+
+        public PostgresCommandOutputTest(PostgresTestFixture fixture)
+        {
+            sessionFactory = new SessionFactory(fixture.ProviderFactory, fixture.ConnectionString);
+        }
+
+        class InsertWithoutputCommand : ICommand<string>
+        {
+            readonly string name;
+            readonly DateTime dob;
+
+            public InsertWithoutputCommand(string name, DateTime dob)
+            {
+                this.name = name;
+                this.dob = dob;
+            }
+
+            public IPreparedCommand<string> Prepare(ICommandBuilder commandBuilder)
+            {
+                return commandBuilder.WithSql("insert into people(name, dob) values (@name, @dob) returning name")
+                    .WithParameter("name", this.name)
+                    .WithParameter("dob", this.dob)
+                    .WithOutputParam<string>()
+                    .Build();
+            }
+        }
+
+        [Fact]
+        public void CommandReturnsOutputParameterWhenReturningOnInsert()
+        {
+            using (var session = this.sessionFactory.CreateCommandSession())
+            {
+                const string name = "Badger";
+                session.Execute(new InsertWithoutputCommand(name, DateTime.Today)).ShouldBe(name);
+
+                session.Commit();
+            }
+        }
+    }
+
     public class PostgresTimeoutTest : IClassFixture<PostgresTestFixture>
     {
         readonly SessionFactory sessionFactory;
@@ -60,7 +103,7 @@ namespace Badger.Data.Tests.Postgres
 
         class TimeoutCommand : ICommand
         {
-            public IPreparedCommand Prepare(ICommandBuilder commandBuilder)
+            public IPreparedCommand<int> Prepare(ICommandBuilder commandBuilder)
             {
                 return commandBuilder
                     .WithSql("select pg_sleep(5)")

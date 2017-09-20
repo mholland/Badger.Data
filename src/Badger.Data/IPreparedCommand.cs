@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace Badger.Data
 {
-    public interface IPreparedCommand
+    public interface IPreparedCommand<T>
     {
-        Task<int> ExecuteAsync(CancellationToken cancellationToken);
-        int Execute();
+        Task<T> ExecuteAsync(CancellationToken cancellationToken);
+        T Execute();
     }
 }

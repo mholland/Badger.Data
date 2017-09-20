@@ -35,9 +35,16 @@ namespace Badger.Data
         /// <returns></returns>
         ICommandBuilder WithTimeout(TimeSpan timeout);
 
+        ICommandBuilder<T> WithOutputParam<T>();
+
         /// <summary>
         /// Builds the prepared command.
         /// </summary>
-        IPreparedCommand Build();
+        IPreparedCommand<int> Build();
+    }
+
+    public interface ICommandBuilder<T>
+    {
+        IPreparedCommand<T> Build();
     }
 }

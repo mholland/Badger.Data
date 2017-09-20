@@ -10,10 +10,30 @@ namespace Badger.Data.Commands
             : base (command)
         {
         }
-  
-        public IPreparedCommand Build()
+
+        public ICommandBuilder<T> WithOutputParam<T>()
+        {
+            return new CommandBuilder<T>(this.command);
+        }
+
+        public IPreparedCommand<int> Build()
         {
             return new PreparedCommand(this.command);
+        }
+    }
+
+    internal sealed class CommandBuilder<T> : ICommandBuilder<T>
+    {
+        readonly DbCommand command;
+
+        public CommandBuilder(DbCommand command)
+        {
+            this.command = command;
+        }
+
+        public IPreparedCommand<T> Build()
+        {
+            return new PreparedScalarCommand<T>(this.command);
         }
     }
 }

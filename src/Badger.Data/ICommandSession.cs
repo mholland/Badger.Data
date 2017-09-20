@@ -6,9 +6,9 @@ namespace Badger.Data
 {
     public interface ICommandSession : IDisposable
     {
-        int Execute(ICommand command);
-        Task<int> ExecuteAsync(ICommand command, CancellationToken cancellationToken);
-        Task<int> ExecuteAsync(ICommand command);
+        T Execute<T>(ICommand<T> command);
+        Task<T> ExecuteAsync<T>(ICommand<T> command, CancellationToken cancellationToken);
+        Task<T> ExecuteAsync<T>(ICommand<T> command);
         void Commit();
     }
 }
